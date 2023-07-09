@@ -1,0 +1,3 @@
+--- Trollge Universe Incident Script
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/RedZenXYZ/TrollgeUniverseIncident/main/Trollge%20Universe%20Incident"))()
