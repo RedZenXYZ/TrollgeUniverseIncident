@@ -171,11 +171,15 @@ TeleportToChests.MouseButton1Click:Connect(function()
 		while _G.Teleport == true do wait(1)
 			for i,v in pairs(workspace.chests:GetChildren()) do
 				if v:IsA("Part") and v:FindFirstChildOfClass("ProximityPrompt") then
-					wait(1)
-					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z) * CFrame.new(0, -8, 0)
-					Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,-3.5, 0)
-					wait(.2)
-					fireproximityprompt(v:FindFirstChildOfClass("ProximityPrompt"))
+					if _G.Teleport == true then
+						wait(1)
+						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z) * CFrame.new(0, -8, 0)
+						Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,-3.5, 0)
+						wait(.2)
+						fireproximityprompt(v:FindFirstChildOfClass("ProximityPrompt"))
+					elseif _G.Teleport == false then
+						break
+					end
 				end
 			end
 		end
@@ -519,19 +523,3 @@ Rejoin.MouseButton1Click:Connect(function()
 		game:GetService("TeleportService"):Teleport(game.PlaceId)
 	end
 end)
-
-for i,v in pairs(game:GetService("Workspace").map.Map:GetChildren()) do
-	if v:IsA("Part") and v.Transparency == 1 then
-		v:Destroy()
-	end
-end
-for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
-	if v:IsA("Part") and v.Transparency == 1 then
-		v:Destroy()
-	end
-end
-for i,v in pairs(game:GetService("Workspace").map:GetChildren()) do
-	if v:IsA("Part") and v.Transparency == 1 then
-		v:Destroy()
-	end
-end
