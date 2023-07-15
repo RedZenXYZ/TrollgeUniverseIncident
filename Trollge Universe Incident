@@ -1,7 +1,12 @@
+--- [ Main Gui ] ---
+
+game:GetService("Workspace").FallenPartsDestroyHeight = -50000
+
 _G.Teleport = false
 _G.Collect = false
 _G.OpenAllChests = false
 _G.Delete = false
+_G.Safe = false
 wait(.1)
 if Noclipping then
 	Noclipping:Disconnect()
@@ -24,23 +29,27 @@ local Frame2 = Instance.new("Frame")
 local TextLabel = Instance.new("TextLabel")
 local KillGui = Instance.new("TextButton")
 local Mini = Instance.new("TextButton")
-local TeleportToChests = Instance.new("TextButton")
-local TeleportToChestsSetting = Instance.new("TextButton")
-local TeleportToChestsDelay = Instance.new("TextBox")
-local AutoCollectChests = Instance.new("TextButton")
-local AutoCollectSetting = Instance.new("TextButton")
-local AutoCollectDelay = Instance.new("TextBox")
-local GotoShop = Instance.new("TextButton")
-local Fix = Instance.new("TextButton")
 local Next = Instance.new("TextButton")
 local Back = Instance.new("TextButton")
 local Page = Instance.new("TextLabel")
-local AutoOpenAllChests = Instance.new("TextButton")
-local DeleteOilAndBloodCup = Instance.new("TextButton")
-local TeleportTool = Instance.new("TextButton")
-local ServerHop = Instance.new("TextButton")
-local Rejoin = Instance.new("TextButton")
-local Part = Instance.new("Part")
+local FrameStorage = Instance.new("Folder", Frame2)
+
+Part = Instance.new("Part")
+Part.Name = "CreatePart"
+Part.Parent = Workspace
+Part.CFrame = CFrame.new(0, 0, 0)
+Part.Transparency = .75
+Part.Size = Vector3.new(50,1,50)
+Part.Anchored = true
+
+SafePart = Instance.new("Part")
+SafePart.Name = "Safe Path"
+SafePart.Parent = Workspace
+SafePart.Anchored = true
+SafePart.Size = Vector3.new(1000,20,1000)
+SafePart.CFrame = CFrame.new(1,99975,1)
+
+FrameStorage.Name = "FrameStorage"
 
 AutoChestsGui.Name = "AutoChestsGui"
 AutoChestsGui.Parent = game.CoreGui
@@ -59,7 +68,7 @@ Frame.Visible = true
 
 Frame2.Name = "Frame2"
 Frame2.Parent = Frame
-Frame2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+Frame2.BackgroundColor3 = Color3.fromHSV(0, 1, 1)
 Frame2.BackgroundTransparency = .5
 Frame2.BorderColor3 = Color3.fromRGB(255, 255, 255)
 Frame2.BorderSizePixel = 2
@@ -93,19 +102,7 @@ KillGui.TextSize = 20
 KillGui.Visible = true
 KillGui.BackgroundTransparency = .75
 KillGui.MouseButton1Click:Connect(function()
-	_G.Teleport = false
-	_G.Collect = false
 	AutoChestsGui:Destroy()
-	if Noclipping then
-		Noclipping:Disconnect()
-	end
-	Clip = true
-	for i = 1, 5 do
-		pcall(function()
-			game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity"):Destroy()
-			game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyGyro"):Destroy()
-		end)
-	end
 end)
 
 Mini.Name = "Mini"
@@ -126,146 +123,6 @@ Mini.MouseButton1Click:Connect(function()
 	elseif Mini.Text == "+" then
 		Mini.Text = "-"
 		Frame2.Visible = true
-	end
-end)
-
-Part.Name = "CreatePart"
-Part.Parent = Workspace
-Part.CFrame = CFrame.new(0, 0, 0)
-Part.Transparency = .75
-Part.Size = Vector3.new(50,1,50)
-Part.Anchored = true
-
-TeleportToChests.Name = "TeleportToChests"
-TeleportToChests.Parent = Frame2
-TeleportToChests.Size = UDim2.new(0, 125, 0, 25)
-TeleportToChests.Position = UDim2.new(0, 12.5, 0, 12.5)
-TeleportToChests.Text = "Teleport To Chests (Off)"
-TeleportToChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-TeleportToChests.TextColor3 = Color3.fromRGB(255, 255, 255)
-TeleportToChests.TextScaled = true
-TeleportToChests.TextSize = 20
-TeleportToChests.Visible = true
-TeleportToChests.BackgroundTransparency = .5
-TeleportToChests.BorderColor3 = Color3.fromRGB(255, 255, 255)
-TeleportToChests.BorderSizePixel = 2
-TeleportToChests.MouseButton1Click:Connect(function()
-	if TeleportToChests.Text == "Teleport To Chests (Off)" then
-		TeleportToChests.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-		TeleportToChests.Text = "Teleport To Chests (On)"
-		local Noclipping = nil
-		local speaker = game.Players.LocalPlayer
-		Clip = false
-		wait(0.1)
-		local function NoclipLoop()
-			if Clip == false and speaker.Character ~= nil then
-				for _, child in pairs(speaker.Character:GetDescendants()) do
-					if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
-						child.CanCollide = false
-					end
-				end
-			end
-		end
-		Noclipping = game:GetService('RunService').Stepped:Connect(NoclipLoop)
-		_G.Teleport = true
-		while _G.Teleport == true do wait(1)
-			for i,v in pairs(workspace.chests:GetChildren()) do
-				if v:IsA("Part") and v:FindFirstChildOfClass("ProximityPrompt") then
-					if _G.Teleport == true then
-						wait(1)
-						game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(v.Position.X, v.Position.Y, v.Position.Z) * CFrame.new(0, -8, 0)
-						Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0,-3.5, 0)
-						wait(.2)
-						fireproximityprompt(v:FindFirstChildOfClass("ProximityPrompt"))
-					elseif _G.Teleport == false then
-						break
-					end
-				end
-			end
-		end
-	elseif TeleportToChests.Text == "Teleport To Chests (On)" then
-		TeleportToChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-		TeleportToChests.Text = "Teleport To Chests (Off)"
-		wait(.1)
-		_G.Teleport = false
-		wait(.1)
-		if Noclipping then
-			Noclipping:Disconnect()
-		end
-		Clip = true
-	end
-end)
-
-AutoCollectChests.Name = "AutoCollectChests"
-AutoCollectChests.Parent = Frame2
-AutoCollectChests.Size = UDim2.new(0, 125, 0, 25)
-AutoCollectChests.Position = UDim2.new(0, 12.5, 0, 50)
-AutoCollectChests.Text = "Auto Collect Chests (Patch)"
-AutoCollectChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-AutoCollectChests.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoCollectChests.TextScaled = true
-AutoCollectChests.TextSize = 20
-AutoCollectChests.Visible = true
-AutoCollectChests.BackgroundTransparency = .5
-AutoCollectChests.BorderColor3 = Color3.fromRGB(255, 255, 255)
-AutoCollectChests.BorderSizePixel = 2
-AutoCollectChests.MouseButton1Click:Connect(function()
-
-end)
-
-GotoShop.Name = "GotoShop"
-GotoShop.Parent = Frame2
-GotoShop.Size = UDim2.new(0, 125, 0, 25)
-GotoShop.Position = UDim2.new(0, 12.5, 0, 87.5)
-GotoShop.Text = "Teleport To Shop"
-GotoShop.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-GotoShop.BorderColor3 = Color3.fromRGB(255, 255, 255)
-GotoShop.BorderSizePixel = 2
-GotoShop.TextColor3 = Color3.fromRGB(255, 255, 255)
-GotoShop.TextScaled = true
-GotoShop.TextSize = 20
-GotoShop.Visible = true
-GotoShop.BackgroundTransparency = .5
-GotoShop.MouseButton1Click:Connect(function()
-	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(580, 117, -113)
-end)
-
-Fix.Name = "Fix"
-Fix.Parent = Frame2
-Fix.Size = UDim2.new(0, 125, 0, 25)
-Fix.Position = UDim2.new(0, 12.5, 0, 125)
-Fix.Text = "Fix : Float, Noclip, Teleport, AutoCollect, AutoOpenChests"
-Fix.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Fix.BorderColor3 = Color3.fromRGB(255, 255, 255)
-Fix.BorderSizePixel = 2
-Fix.TextColor3 = Color3.fromRGB(255, 255, 255)
-Fix.TextScaled = true
-Fix.TextSize = 20
-Fix.Visible = true
-Fix.BackgroundTransparency = .5
-Fix.MouseButton1Click:Connect(function()
-	if Noclipping then
-		Noclipping:Disconnect()
-	end
-	Clip = true
-	_G.Teleport = false
-	_G.Collect = false
-	_G.OpenAllChests = false
-	_G.Delete = false
-	AutoCollectChests.Text = "Auto Collect Chests (Off)"
-	AutoCollectChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	TeleportToChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	TeleportToChests.Text = "Teleport To Chests (Off)"
-	AutoOpenAllChests.Text = "Auto Open Chests (Off)"
-	AutoOpenAllChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	DeleteOilAndBloodCup.Text = "Auto Delete Oil And Blood Cup (Off)"
-	DeleteOilAndBloodCup.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(700, 159, -140)
-	for i = 1, 5 do
-		pcall(function()
-			game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyVelocity"):Destroy()
-			game.Players.LocalPlayer.Character.HumanoidRootPart:FindFirstChildOfClass("BodyGyro"):Destroy()
-		end)
 	end
 end)
 
@@ -297,25 +154,27 @@ Next.TextSize = 20
 Next.Visible = true
 Next.BackgroundTransparency = .5
 Next.MouseButton1Click:Connect(function()
-	if Page.Text == "1" then
-		Page.Text = "2"
-		Back.Visible = true
-		Fix.Visible = false
-		GotoShop.Visible = false
-		AutoCollectChests.Visible = false
-		TeleportToChests.Visible = false
-		DeleteOilAndBloodCup.Visible = true
-		AutoOpenAllChests.Visible = true
-		TeleportTool.Visible = true
-	elseif Page.Text == "2" then
-		Page.Text = "3"
-		Page.Position = UDim2.new(0, 125, 0, 160)
+	if tonumber(Page.Text) >= _G.MaxPage - 1 then
+		Page.Text = tostring(_G.MaxPage)
 		Next.Visible = false
-		AutoOpenAllChests.Visible = false
-		DeleteOilAndBloodCup.Visible = false
-		TeleportTool.Visible = false
-		ServerHop.Visible = true
-		Rejoin.Visible = true 
+		Back.Visible = true
+		Page.Position = UDim2.new(0, 125, 0, 160)
+		if FrameStorage:FindFirstChild(Page.Text) then
+			FrameStorage:FindFirstChild(Page.Text).Visible = true
+		end
+		if FrameStorage:FindFirstChild(Page.Text - 1) then
+			FrameStorage:FindFirstChild(Page.Text - 1).Visible = false
+		end
+	else
+		Page.Text = Page.Text + 1
+		Page.Position = UDim2.new(0, 96, 0, 160)
+		Back.Visible = true
+		if FrameStorage:FindFirstChild(Page.Text) then
+			FrameStorage:FindFirstChild(Page.Text).Visible = true
+		end
+		if FrameStorage:FindFirstChild(Page.Text - 1) then
+			FrameStorage:FindFirstChild(Page.Text - 1).Visible = false
+		end
 	end
 end)
 
@@ -333,82 +192,229 @@ Back.TextSize = 20
 Back.Visible = false
 Back.BackgroundTransparency = .5
 Back.MouseButton1Click:Connect(function()
-	if Page.Text == "2" then
+	if tonumber(Page.Text) <= 2 then
 		Page.Text = "1"
+		Page.Position = UDim2.new(0, 96, 0, 160)
 		Back.Visible = false
-		Fix.Visible = true
-		GotoShop.Visible = true
-		AutoCollectChests.Visible = true
-		TeleportToChests.Visible = true
-		DeleteOilAndBloodCup.Visible = false
-		AutoOpenAllChests.Visible = false
-		TeleportTool.Visible = false
-	elseif Page.Text == "3" then
-		Page.Text = "2"
+		Next.Visible = true
+		if FrameStorage:FindFirstChild(Page.Text ) then
+			FrameStorage:FindFirstChild(Page.Text).Visible = true
+		end
+		if FrameStorage:FindFirstChild(Page.Text + 1) then
+			FrameStorage:FindFirstChild(Page.Text + 1).Visible = false
+		end
+	else
+		Page.Text = Page.Text - 1
 		Page.Position = UDim2.new(0, 96, 0, 160)
 		Next.Visible = true
-		Fix.Visible = false
-		GotoShop.Visible = false
-		AutoCollectChests.Visible = false
-		TeleportToChests.Visible = false
-		AutoOpenAllChests.Visible = true
-		DeleteOilAndBloodCup.Visible = true
-		TeleportTool.Visible = true
-		ServerHop.Visible = false
-		Rejoin.Visible = false 
+		if FrameStorage:FindFirstChild(Page.Text) then
+			FrameStorage:FindFirstChild(Page.Text).Visible = true
+		end
+		if FrameStorage:FindFirstChild(Page.Text + 1) then
+			FrameStorage:FindFirstChild(Page.Text + 1).Visible = false
+		end
 	end
 end)
 
-AutoOpenAllChests.Name = "AutoOpenAllChests"
-AutoOpenAllChests.Parent = Frame2
-AutoOpenAllChests.Size = UDim2.new(0, 125, 0, 25)
-AutoOpenAllChests.Position = UDim2.new(0, 12.5, 0, 12.5)
-AutoOpenAllChests.Text = "Auto Open Chests (Off)"
-AutoOpenAllChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-AutoOpenAllChests.BorderColor3 = Color3.fromRGB(255, 255, 255)
-AutoOpenAllChests.BorderSizePixel = 2
-AutoOpenAllChests.TextColor3 = Color3.fromRGB(255, 255, 255)
-AutoOpenAllChests.TextScaled = true
-AutoOpenAllChests.TextSize = 20
-AutoOpenAllChests.Visible = false
-AutoOpenAllChests.BackgroundTransparency = .5
-AutoOpenAllChests.MouseButton1Click:Connect(function()
-	if AutoOpenAllChests.Text == "Auto Open Chests (Off)" then
-		AutoOpenAllChests.Text = "Auto Open Chests (On)"
-		AutoOpenAllChests.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+spawn(function()
+	FrameStorage:WaitForChild("1").Visible = true
+	if _G.MaxPage == 1 then
+		Page.Visible = false
+	else
+		Page.Visible = true
+	end
+end)
+
+--- [ Functions ] ---
+
+function ChecksIdkFr()
+	if _G.CurrentFrameFrFr:FindFirstChild("Shit Thing Number Two") then
+		_G.CurrentFrameFrFr:FindFirstChild("Shit Thing Number Two"):Destroy()
+	end
+	InvisibleButtonShitIdk2 = Instance.new("TextButton", _G.CurrentFrameFrFr)
+	InvisibleButtonShitIdk2.Name = "Shit Thing Number Two"
+	InvisibleButtonShitIdk2.Text = ""
+end
+
+_G.MaxPage = 0
+function newPage()
+	_G.MaxPage = _G.MaxPage + 1
+	newScrollFrame = Instance.new("ScrollingFrame", FrameStorage)
+	List = Instance.new("UIListLayout", newScrollFrame)
+	InvisibleButtonShitIdk1 = Instance.new("TextButton", newScrollFrame)
+	_G.CurrentFrameFrFr = newScrollFrame
+	
+	InvisibleButtonShitIdk1.Name = "Shit Thing Number One"
+	InvisibleButtonShitIdk1.Text = ""
+	
+	List.Padding = UDim.new(0, 10)
+	List.FillDirection = Enum.FillDirection.Vertical
+	List.HorizontalAlignment = Enum.HorizontalAlignment.Center
+	List.SortOrder = Enum.SortOrder.LayoutOrder
+	
+	newScrollFrame.Name = #FrameStorage:GetChildren()
+	newScrollFrame.BorderSizePixel = 0
+	newScrollFrame.BackgroundTransparency = 1
+	newScrollFrame.Size = UDim2.new(0, 150, 0, 157)
+	newScrollFrame.Active = true
+	newScrollFrame.Visible = false
+	newScrollFrame.ScrollBarThickness = 0
+	newScrollFrame.ElasticBehavior = Enum.ElasticBehavior.Never
+	newScrollFrame.VerticalScrollBarInset = Enum.ScrollBarInset.Always
+	newScrollFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
+	newScrollFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+	return newScrollFrame
+end
+
+function Btn(Text, callback)
+	newBtn = Instance.new("TextButton", _G.CurrentFrameFrFr)
+	ChecksIdkFr()
+	newBtn.Name = Text
+	newBtn.Size = UDim2.new(0, 125, 0, 25)
+	newBtn.Text = Text
+	newBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	newBtn.BorderColor3 = Color3.fromRGB(255, 255, 255)
+	newBtn.BorderSizePixel = 2
+	newBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	newBtn.TextScaled = true
+	newBtn.BackgroundTransparency = .5
+	newBtn.MouseButton1Click:Connect(callback)
+	return newBtn
+end
+
+function TBox(Text, HolderText)
+	newTextBox = Instance.new("TextBox", _G.CurrentFrameFrFr)
+	ChecksIdkFr()
+	newTextBox.Name = Text
+	newTextBox.Size = UDim2.new(0, 125, 0, 25)
+	newTextBox.Text = Text
+	newTextBox.PlaceholderText = HolderText
+	newTextBox.PlaceholderColor3 = Color3.fromRGB(200, 200, 200)
+	newTextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	newTextBox.BorderColor3 = Color3.fromRGB(255, 255, 255)
+	newTextBox.BorderSizePixel = 2
+	newTextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+	newTextBox.TextScaled = true
+	newTextBox.BackgroundTransparency = .5
+	return newTextBox
+end
+
+function TLabel(Text)
+	newTextLabel = Instance.new("TextBox", _G.CurrentFrameFrFr)
+	ChecksIdkFr()
+	newTextLabel.Name = Text
+	newTextLabel.Size = UDim2.new(0, 125, 0, 25)
+	newTextLabel.Text = Text
+	newTextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	newTextLabel.BorderColor3 = Color3.fromRGB(255, 255, 255)
+	newTextLabel.BorderSizePixel = 2
+	newTextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+	newTextLabel.TextScaled = true
+	newTextLabel.Active = false
+	newTextLabel.BackgroundTransparency = .5
+	return newTextLabel
+end
+
+--- [ Buttons ] ---
+
+newPage()
+toChest = Btn("Teleport To Chests (Off)", function()
+	if toChest.Text == "Teleport To Chests (Off)" then
+		toChest.Text = "Teleport To Chests (On)"
+		toChest.BackgroundColor3 = Color3.new(0, 1, 0)
+		spawn(function()
+			local Noclipping = nil
+			local speaker = game.Players.LocalPlayer
+			Clip = false
+			wait(0.1)
+			local function NoclipLoop()
+				if Clip == false and speaker.Character ~= nil then
+					for _, child in pairs(speaker.Character:GetDescendants()) do
+						if child:IsA("BasePart") and child.CanCollide == true and child.Name ~= floatName then
+							child.CanCollide = false
+						end
+					end
+				end
+			end
+			Noclipping = game:GetService('RunService').Stepped:Connect(NoclipLoop)
+		end)
+		_G.Teleport = true
+		spawn(function()
+			repeat wait(1)
+				pcall(function()
+					Chest = game:GetService("Workspace").chests:FindFirstChildOfClass("Part")
+					if Chest and Chest:FindFirstChildOfClass("ProximityPrompt") then
+						_G.OldCFrame = game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame
+						pcall(function()
+							wait(1)
+							Pos = Chest.Position
+							Pro = Chest:FindFirstChildOfClass("ProximityPrompt")
+							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Pos.X, Pos.Y, Pos.Z) * CFrame.new(0, -8, 0)
+							Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.5, 0)
+							wait(.15)
+							firePro(Pro)
+							wait()
+							game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.OldCFrame
+						end)
+					end
+				end)
+			until _G.Teleport == false
+		end)
+	elseif toChest.Text == "Teleport To Chests (On)" then
+		toChest.Text = "Teleport To Chests (Off)"
+		toChest.BackgroundColor3 = Color3.new(1, 0, 0)
+		wait(.1)
+		_G.Teleport = false
+		wait(.1)
+		if Noclipping then
+			Noclipping:Disconnect()
+		end
+		Clip = true
+	end
+end)
+toChest.BackgroundColor3 = Color3.new(1, 0, 0)
+
+Collect = Btn("Auto Collect Chests (Off)", function()
+	if Collect.Text == "Auto Collect Chests (Off)" then
+		Collect.Text = "Auto Collect Chests (On)"
+		Collect.BackgroundColor3 = Color3.new(0, 1, 0)
+		_G.Collect = true
+		repeat wait(1)
+			firePro(nearestChest():FindFirstChildOfClass("ProximityPrompt"))
+		until _G.Collect == false
+	elseif Collect.Text == "Auto Collect Chests (On)" then
+		Collect.Text = "Auto Collect Chests (Off)"
+		Collect.BackgroundColor3 = Color3.new(1, 0, 0)
+		_G.Collect = false
+	end
+end)
+Collect.BackgroundColor3 = Color3.new(1, 0, 0)
+
+OpenChests = Btn("Auto Open Chests (Off)", function()
+	if OpenChests.Text == "Auto Open Chests (Off)" then
+		OpenChests.Text = "Auto Open Chests (On)"
+		OpenChests.BackgroundColor3 = Color3.new(0, 1, 0)
 		_G.OpenAllChests = true
 		while _G.OpenAllChests == true do wait(1)
 			for i,v in pairs(game.Players.LocalPlayer:FindFirstChildOfClass("Backpack"):GetChildren()) do
-				if v.Name == "Chest" or v.Name == "Dark Chest" or v.Name == "Light Chest" then
+				if v:IsA("Tool") and string.find(v.Name, "Chest") then
 					v.Parent = game.Players.LocalPlayer.Character
 					v:Activate()
 				end
 			end
 		end
-	elseif AutoOpenAllChests.Text == "Auto Open Chests (On)" then
-		AutoOpenAllChests.Text = "Auto Open Chests (Off)"
-		AutoOpenAllChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	elseif OpenChests.Text == "Auto Open Chests (On)" then
+		OpenChests.Text = "Auto Open Chests (Off)"
+		OpenChests.BackgroundColor3 = Color3.new(1, 0, 0)
 		_G.OpenAllChests = false
 	end
 end)
+OpenChests.BackgroundColor3 = Color3.new(1, 0, 0)
 
-DeleteOilAndBloodCup.Name = "DeleteOilAndBloodCup"
-DeleteOilAndBloodCup.Parent = Frame2
-DeleteOilAndBloodCup.Size = UDim2.new(0, 125, 0, 25)
-DeleteOilAndBloodCup.Position = UDim2.new(0, 12.5, 0, 50)
-DeleteOilAndBloodCup.Text = "Auto Delete Oil And Blood Cup (Off)"
-DeleteOilAndBloodCup.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-DeleteOilAndBloodCup.BorderColor3 = Color3.fromRGB(255, 255, 255)
-DeleteOilAndBloodCup.BorderSizePixel = 2
-DeleteOilAndBloodCup.TextColor3 = Color3.fromRGB(255, 255, 255)
-DeleteOilAndBloodCup.TextScaled = true
-DeleteOilAndBloodCup.TextSize = 20
-DeleteOilAndBloodCup.Visible = false
-DeleteOilAndBloodCup.BackgroundTransparency = .5
-DeleteOilAndBloodCup.MouseButton1Click:Connect(function()
-	if DeleteOilAndBloodCup.Text == "Auto Delete Oil And Blood Cup (Off)" then
-		DeleteOilAndBloodCup.Text = "Auto Delete Oil And Blood Cup (On)"
-		DeleteOilAndBloodCup.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+DeleteCups = Btn("Delete Oil/Blood Cups (Off)", function()
+	if DeleteCups.Text == "Delete Oil/Blood Cups (Off)" then
+		DeleteCups.Text = "Delete Oil/Blood Cups (On)"
+		DeleteCups.BackgroundColor3 = Color3.new(0, 1, 0)
 		_G.Delete = true
 		while _G.Delete == true do wait(1)
 			for i,v in pairs(game.Players.LocalPlayer:FindFirstChildOfClass("Backpack"):GetChildren()) do
@@ -417,58 +423,139 @@ DeleteOilAndBloodCup.MouseButton1Click:Connect(function()
 				end
 			end
 		end
-	elseif DeleteOilAndBloodCup.Text == "Auto Delete Oil And Blood Cup (On)" then
-		DeleteOilAndBloodCup.Text = "Auto Delete Oil And Blood Cup (Off)"
-		DeleteOilAndBloodCup.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	elseif DeleteCups.Text == "Delete Oil/Blood Cups (On)" then
+		DeleteCups.Text = "Delete Oil/Blood Cups (Off)"
+		DeleteCups.BackgroundColor3 = Color3.new(1, 0, 0)
 		_G.Delete = false
 	end
 end)
+DeleteCups.BackgroundColor3 = Color3.new(1, 0, 0)
 
-TeleportTool.Name = "TeleportTool"
-TeleportTool.Parent = Frame2
-TeleportTool.Size = UDim2.new(0, 125, 0, 25)
-TeleportTool.Position = UDim2.new(0, 12.5, 0, 87.5)
-TeleportTool.Text = "TeleportTool"
-TeleportTool.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-TeleportTool.BorderColor3 = Color3.fromRGB(255, 255, 255)
-TeleportTool.BorderSizePixel = 2
-TeleportTool.TextColor3 = Color3.fromRGB(255, 255, 255)
-TeleportTool.TextScaled = true
-TeleportTool.TextSize = 20
-TeleportTool.Visible = false
-TeleportTool.BackgroundTransparency = .5
-TeleportTool.MouseButton1Click:Connect(function()
+newPage()
+TeleportTool = Btn("Teleport Tool", function()
 	for i,v in pairs(game.Players.LocalPlayer:FindFirstChildOfClass("Backpack"):GetChildren()) do
 		if v.Name == "Teleport Tool (Click To Teleport)" then
 			v:Destroy()
 		end
 	end
 	mouse = game.Players.LocalPlayer:GetMouse()
-	tool = Instance.new("Tool")
-	tool.RequiresHandle = false
-	tool.Name = "Teleport Tool (Click To Teleport)"
-	tool.Activated:connect(function()
+	TeleportToolFrFr = Instance.new("Tool")
+	TeleportToolFrFr.RequiresHandle = false
+	TeleportToolFrFr.Name = "Teleport Tool (Click To Teleport)"
+	TeleportToolFrFr.Activated:connect(function()
 		local pos = mouse.Hit+Vector3.new(0,2.5,0)
 		pos = CFrame.new(pos.X,pos.Y,pos.Z)
 		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pos
 	end)
-	tool.Parent = game.Players.LocalPlayer.Backpack
+	TeleportToolFrFr.Parent = game.Players.LocalPlayer.Backpack
 end)
 
-ServerHop.Name = "ServerHop"
-ServerHop.Parent = Frame2
-ServerHop.Size = UDim2.new(0, 125, 0, 25)
-ServerHop.Position = UDim2.new(0, 12.5, 0, 12.5)
-ServerHop.Text = "ServerHop"
-ServerHop.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-ServerHop.BorderColor3 = Color3.fromRGB(255, 255, 255)
-ServerHop.BorderSizePixel = 2
-ServerHop.TextColor3 = Color3.fromRGB(255, 255, 255)
-ServerHop.TextScaled = true
-ServerHop.TextSize = 20
-ServerHop.Visible = false
-ServerHop.BackgroundTransparency = .5
-ServerHop.MouseButton1Click:Connect(function()
+toShop = Btn("Go to Shop", function()
+	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(580, 117, -113)
+end)
+
+GotoSafePlace = Btn("Teleport To SafePlace", function()
+	if GotoSafePlace.Text == "Teleport To SafePlace" then
+		GotoSafePlace.Text = "Return"
+		GotoSafePlace.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		for i,v in pairs(Workspace:GetDescendants()) do
+			if v.Name == "WayPointPart" then
+				v:Destroy()
+			end
+		end
+		local WayPointPart = Instance.new("Part")
+		WayPointPart.Name = "WayPointPart"
+		WayPointPart.Parent = Workspace
+		WayPointPart.Size = Vector3.new(1, 1, 1)
+		WayPointPart.Transparency = 1
+		WayPointPart.Anchored = true
+		WayPointPart.CanCollide = false
+		WayPointPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1,100000,1)
+		_G.Safe = true
+		repeat wait(3)
+			if _G.Safe == true then
+				pcall(function()
+					game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(1,100000,1)
+				end)
+			elseif _G.Safe == false then
+				break
+			end
+		until _G.Safe == false
+	elseif GotoSafePlace.Text == "Return" then
+		GotoSafePlace.Text = "Teleport To SafePlace"
+		GotoSafePlace.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		_G.Safe = false
+		wait(.1)
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Workspace.WayPointPart.CFrame
+	end
+end)
+
+Fix = Btn("Fix", function()
+	if Noclipping then
+		Noclipping:Disconnect()
+	end
+	Clip = true
+	_G.Teleport = false
+	_G.Collect = false
+	_G.OpenAllChests = false
+	_G.Delete = false
+	_G.Safe = false
+	Collect.Text = "Auto Collect Chests (Off)"
+	Collect.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	toChest.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	toChest.Text = "Teleport To Chests (Off)"
+	OpenChests.Text = "Auto Open Chests (Off)"
+	OpenChests.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	DeleteCups.Text = "Delete Oil/Blood Cups (Off)"
+	DeleteCups.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	GotoSafePlace.Text = "Teleport To SafePlace"
+	GotoSafePlace.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(700, 159, -140)
+end)
+
+newPage()
+Time = TLabel(game:GetService("Workspace").map.place.ShopBM.Model.Clock.Part.Timer.Txt.Text)
+Time.TextColor3 = Color3.new(0, 1, 0)
+
+ItemNameLabel = TLabel(game:GetService("Workspace").map.place.ShopBM["black_seller"].Head.BuyAtch:FindFirstChildOfClass("ProximityPrompt").ObjectText)
+
+ItemPriceLabel = TLabel("Price: " .. string.gsub(game:GetService("Workspace").map.place.ShopBM["black_seller"].Head.BuyAtch:FindFirstChildOfClass("ProximityPrompt").ActionText, "%D+", ""))
+ItemPriceLabel.TextColor3 = Color3.new(1, 1, 0)
+
+Btn("Buy", function()
+	firePro(game:GetService("Workspace").map.place.ShopBM["black_seller"].Head.BuyAtch:FindFirstChildOfClass("ProximityPrompt"))
+end)
+
+YourCash = TLabel("Your Cash: " .. game:GetService("Players").LocalPlayer.leaderstats.TrollCoins.Value)
+
+spawn(function()
+	while true do wait()
+		pcall(function()
+			ItemNameLabel.Text = game:GetService("Workspace").map.place.ShopBM["black_seller"].Head.BuyAtch:FindFirstChildOfClass("ProximityPrompt").ObjectText
+			ItemPriceLabel.Text = "Price: " .. string.gsub(game:GetService("Workspace").map.place.ShopBM["black_seller"].Head.BuyAtch:FindFirstChildOfClass("ProximityPrompt").ActionText, "%D+", "")
+			YourCash.Text = "Your Cash: " .. game:GetService("Players").LocalPlayer.leaderstats.TrollCoins.Value
+			Time.Text = game:GetService("Workspace").map.place.ShopBM.Model.Clock.Part.Timer.Txt.Text
+		end)
+	end
+end)
+
+newPage()
+Rejoin = Btn("Rejoin", function()
+	if Rejoin.Text == "Rejoin" then
+		Rejoin.Text = "Are You Sure?"
+		Rejoin.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		wait(3)
+		Rejoin.Text = "Rejoin"
+		Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	elseif Rejoin.Text == "Are You Sure?" then
+		Rejoin.Text = "Please Wait..."
+		Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		game:GetService("TeleportService"):Teleport(game.PlaceId)
+	end
+end)
+
+ServerHop = Btn("ServerHop", function()
 	if ServerHop.Text == "ServerHop" then
 		ServerHop.Text = "Are You Sure?"
 		ServerHop.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
@@ -497,29 +584,31 @@ ServerHop.MouseButton1Click:Connect(function()
 	end
 end)
 
-Rejoin.Name = "Rejoin"
-Rejoin.Parent = Frame2
-Rejoin.Size = UDim2.new(0, 125, 0, 25)
-Rejoin.Position = UDim2.new(0, 12.5, 0, 50)
-Rejoin.Text = "Rejoin"
-Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-Rejoin.BorderColor3 = Color3.fromRGB(255, 255, 255)
-Rejoin.BorderSizePixel = 2
-Rejoin.TextColor3 = Color3.fromRGB(255, 255, 255)
-Rejoin.TextScaled = true
-Rejoin.TextSize = 20
-Rejoin.Visible = false
-Rejoin.BackgroundTransparency = .5
-Rejoin.MouseButton1Click:Connect(function()
-	if Rejoin.Text == "Rejoin" then
-		Rejoin.Text = "Are You Sure?"
-		Rejoin.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-		wait(3)
-		Rejoin.Text = "Rejoin"
-		Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	elseif Rejoin.Text == "Are You Sure?" then
-		Rejoin.Text = "Please Wait..."
-		Rejoin.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-		game:GetService("TeleportService"):Teleport(game.PlaceId)
+function firePro(proximityPrompt)
+	if fireproximityprompt then
+		fireproximityprompt(proximityPrompt)
+	else
+		game:GetService("StarterGui"):SetCore("SendNotification",{
+		    Title = "Your Exploit Don't Support...";
+		    Text = "Your Exploit Don't Support fireproximityprompt()";
+		    Duration = 10;
+		})
 	end
-end)
+end
+
+function nearestChest()
+	local player = game.Players.LocalPlayer
+	local character = player.Character or player.CharacterAdded:Wait()
+	local ohVector32 = character.HumanoidRootPart.Position
+	local closestChest, closestDistance
+	for _, p in pairs(workspace.chests:GetChildren()) do
+		if p:IsA("Part") and p:FindFirstChildOfClass("ProximityPrompt") then
+			local distance = (ohVector32 - p.Position).Magnitude
+			if not closestDistance or distance < closestDistance then
+				closestDistance = distance
+				closestChest = p
+			end
+		end
+	end
+	return closestChest
+end
