@@ -317,6 +317,25 @@ end
 
 --- [ Buttons ] ---
 
+spawn(function()
+	while true do wait()
+		spawn(function()
+			pcall(function()
+				for _, others in pairs(game:GetService("Workspace").other:GetChildren()) do
+					others.Parent = game:GetService("Workspace").chests
+				end
+			end)
+		end)
+		spawn(function()
+			pcall(function()
+				for i, npcs in pairs(game:GetService("Workspace")["boss's"]:GetChildren()) do
+					npcs.Parent = game:GetService("Workspace").npcs
+				end
+			end)
+		end)
+	end
+end)
+
 newPage()
 toChest = Btn("Teleport To Chests (Off)", function()
 	if toChest.Text == "Teleport To Chests (Off)" then
@@ -351,7 +370,7 @@ toChest = Btn("Teleport To Chests (Off)", function()
 							Pro = Chest:FindFirstChildOfClass("ProximityPrompt")
 							game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Pos.X, Pos.Y, Pos.Z) * CFrame.new(0, -8, 0)
 							Part.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame * CFrame.new(0, -3.5, 0)
-							wait(.15)
+							wait(.2)
 							firePro(Pro)
 							wait()
 							game:GetService("Players").LocalPlayer.Character:FindFirstChild("HumanoidRootPart").CFrame = _G.OldCFrame
@@ -380,7 +399,9 @@ Collect = Btn("Auto Collect Chests (Off)", function()
 		Collect.BackgroundColor3 = Color3.new(0, 1, 0)
 		_G.Collect = true
 		repeat wait(1)
-			firePro(nearestChest():FindFirstChildOfClass("ProximityPrompt"))
+			pcall(function()
+				firePro(nearestChest():FindFirstChildOfClass("ProximityPrompt"))
+			end)
 		until _G.Collect == false
 	elseif Collect.Text == "Auto Collect Chests (On)" then
 		Collect.Text = "Auto Collect Chests (Off)"
@@ -430,6 +451,34 @@ DeleteCups = Btn("Delete Oil/Blood Cups (Off)", function()
 	end
 end)
 DeleteCups.BackgroundColor3 = Color3.new(1, 0, 0)
+
+KillAura = Btn("NPCs Kill Aura (Off)", function()
+	if KillAura.Text == "NPCs Kill Aura (Off)" then
+		KillAura.Text = "NPCs Kill Aura (On)"
+		KillAura.BackgroundColor3 = Color3.new(0, 1, 0)
+		_G.KillAura = true
+		repeat wait()
+			pcall(function()
+				local dist = 15
+				local target = nil
+				for i,v in pairs(game:GetService("Workspace").npcs:GetChildren()) do
+					if v:IsA("Model") and v:FindFirstChild("HumanoidRootPart") and v:FindFirstChildOfClass("Humanoid") and v:FindFirstChildOfClass("Humanoid").Health ~= 0 then
+					local magnitude = (v.HumanoidRootPart.Position - game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.Position).magnitude
+						if magnitude < dist then
+							dist = magnitude
+							v:FindFirstChildOfClass("Humanoid").Health = 0
+						end
+					end
+				end
+			end)
+		until _G.KillAura == false
+	elseif KillAura.Text == "NPCs Kill Aura (On)" then
+		KillAura.Text = "NPCs Kill Aura (Off)"
+		KillAura.BackgroundColor3 = Color3.new(1, 0, 0)
+		_G.KillAura = false
+	end
+end)
+KillAura.BackgroundColor3 = Color3.new(1, 0, 0)
 
 newPage()
 TeleportTool = Btn("Teleport Tool", function()
@@ -581,6 +630,23 @@ ServerHop = Btn("ServerHop", function()
 				ServerHop.Text = "ServerHop"
 			end
 		end
+	end
+end)
+
+Reset = Btn("Reset", function()
+	if Reset.Text == "Reset" then
+		Reset.Text = "Are You Sure?"
+		Reset.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+		wait(3)
+		Reset.Text = "Reset"
+		Reset.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	elseif Reset.Text == "Are You Sure?" then
+		Reset.Text = "Reseting..."
+		Reset.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		pcall(function()
+			game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid").Health = 0
+		end)
+		Reset.Text = "Reset"
 	end
 end)
 
