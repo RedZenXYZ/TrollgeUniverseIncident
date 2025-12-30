@@ -32,7 +32,10 @@ addToggle("Auto Chest", function()
 			if prox and obj:FindFirstChild("loaded") or obj.Parent == collectable["other"] then
 				Clip = false
 				debound = true
-				TP(obj.CFrame * CFrame.new(0, -8, 0))
+				
+				local pos = obj.Position
+				local CF = CFrame.new(pos.X, pos.Y - 8, pos.Z)
+				TP(CF)
 				Part.Position = root.Position + vector.create(0, -3.5, 0)
 				task.wait(0.2)
 				fireproximityprompt(prox)
