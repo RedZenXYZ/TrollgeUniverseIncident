@@ -49,7 +49,7 @@ addToggle("Auto Chest", function()
 end)
 
 addToggle("Chest Aura", function()
-	for _,chest in chests:GetChildren() do
+	for _,chest in collectable["chests"]:GetChildren() do
 		local dist = plr:DistanceFromCharacter(chest.Position)
 		local prox = chest:FindFirstChildOfClass("ProximityPrompt")
 		if dist < 20 and prox then
