@@ -2,6 +2,15 @@ game:GetService("Workspace").FallenPartsDestroyHeight = -50000
 
 local plr = game:GetService("Players").LocalPlayer
 
+local IgnoreItems = {
+	"Metal_p",
+	"Rope_p",
+	"Leather_p",
+	"Meat_p",
+	"Line Paper_p"
+}
+
+local npcs_guilds = game:GetService("Workspace").npcs_guilds
 local collectable = {
 	["chests"] = game:GetService("Workspace").chests,
 	["other"] = game:GetService("Workspace").other
@@ -29,7 +38,7 @@ addToggle("Auto Chest", function()
 	for _,folder in collectable do
 		for _,obj in folder:GetChildren() do
 			local prox = obj:FindFirstChildOfClass("ProximityPrompt")
-			if prox and obj:FindFirstChild("loaded") or obj.Parent == collectable["other"] then
+			if not table.find(IgnoreItems, obj.Name) and prox and obj:FindFirstChild("loaded") or obj.Parent == collectable["other"] then
 				Clip = false
 				debound = true
 				
@@ -52,11 +61,13 @@ addToggle("Auto Chest", function()
 end)
 
 addToggle("Chest Aura", function()
-	for _,chest in collectable["chests"]:GetChildren() do
-		local dist = plr:DistanceFromCharacter(chest.Position)
-		local prox = chest:FindFirstChildOfClass("ProximityPrompt")
-		if dist < 20 and prox then
-			fireproximityprompt(prox)
+	for _,folder in collectable do
+		for _,obj in folder:GetChildren() do
+			local dist = plr:DistanceFromCharacter(obj.Position)
+			local prox = obj:FindFirstChildOfClass("ProximityPrompt")
+			if not table.find(IgnoreItems, obj.Name) and dist < 20 and prox then
+				fireproximityprompt(prox)
+			end
 		end
 	end
 end)
@@ -71,8 +82,26 @@ addToggle("Auto Open", function()
 end)
 
 createPage("Teleport")
+local npc_guild = addButton("NPC Guild", function()
+	local npc = npcs_guilds:FindFirstChildOfClass("Model")
+	
+	if npc then
+		TP(npc:FindFirstChild("HumanoidRootPart"))
+	else
+		notification("There's no NPC Guild yet.", "NPC Notification")
+	end
+end)
+
 addButton("Shop", function()
 	TP(CFrame.new(580, 117, -113))
+end)
+
+addButton("Root Top", function()
+	TP(CFrame.new(138, 207, -168))
+end)
+
+addButton("Buyer", function()
+	TP(CFrame.new(251, 117, -436))
 end)
 
 createPage("Others")
@@ -106,6 +135,17 @@ end)
 
 --+ [ SCRIPT ] +--
 
+task.spawn(function()
+	while task.wait(1) do
+		npc_guild.BackgroundColor3 = #npcs_guilds:GetChildren() == 1 and Color3.new(0, 1, 0) or Color3.new(1, 0, 0)
+		npc_guild.Text = #npcs_guilds:GetChildren() == 1 and "To: " .. npcs_guilds:FindFirstChildOfClass("Model").Name or "No NPC Guild yet"
+	end
+end)
+
+npcs_guilds.ChildAdded:Connect(function(npc)
+	notification(npc.Name .. ": has spawned.", "NPC Notification")
+end)
+
 Noclipping = game:GetService('RunService').Stepped:Connect(function()
 	local char = plr.Character
 	if Clip == false and char ~= nil then
@@ -128,4 +168,13 @@ function TP(obj)
 	local cframe = typeof(obj) == "CFrame" and obj or obj.CFrame
 	
 	char.HumanoidRootPart.CFrame = cframe
+end
+
+function notification(Input, Name)
+	game.StarterGui:SetCore("SendNotification",
+	{
+		Title = Name;
+		Text = ("[" .. tostring(Input) .. "]");
+		Duration = 5
+	})
 end
