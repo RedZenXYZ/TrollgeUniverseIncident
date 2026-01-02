@@ -81,6 +81,15 @@ addToggle("Auto Open", function()
 	end
 end)
 
+addToggle("Grab Dropped", function()
+	local humanoid = plr.Character:FindFirstChildWhichIsA("Humanoid")
+	for _, child in ipairs(workspace:GetChildren()) do
+		if plr.Character and child:IsA("BackpackItem") and child:FindFirstChild("Handle") then
+			humanoid:EquipTool(child)
+		end
+	end
+end)
+
 createPage("Teleport")
 local npc_guild = addButton("NPC Guild", function()
 	local npc = npcs_guilds:FindFirstChildOfClass("Model")
@@ -134,6 +143,24 @@ addButton("ServerHop", function()
 end)
 
 --+ [ SCRIPT ] +--
+
+local cloneref = cloneref or function(o) return o end
+local GC = getconnections or get_signal_cons
+if GC then
+	for i,v in GC(plr.Idled) do
+		if v["Disable"] then
+			v["Disable"](v)
+		elseif v["Disconnect"] then
+			v["Disconnect"](v)
+		end
+	end
+else
+	local VirtualUser = cloneref(game:GetService("VirtualUser"))
+	plr.Idled:Connect(function()
+		VirtualUser:CaptureController()
+		VirtualUser:ClickButton2(Vector2.new())
+	end)
+end
 
 task.spawn(function()
 	while task.wait(1) do
